@@ -1,0 +1,62 @@
+version: '3.9'
+
+networks:
+  dev_network:
+
+services:
+  redis:
+    image: redis:7.2.4-alpine3.19
+    ports:
+      - "6379:6379"
+    networks:
+      dev_network:
+        aliases:
+          - db-redis
+
+  mongo:
+    image: mongo:7.0.5
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: exel
+      MONGO_INITDB_ROOT_PASSWORD: novgorod101
+    depends_on:
+      - redis
+    networks:
+      dev_network:
+        aliases:
+          - db-mongo
+
+  app:
+    build:
+      context: .
+    ports:
+      - "5000:5000"
+    environment:
+      CELERY_BROKER: ${CELERY_BROKER}
+      CELERY_BACKEND: ${CELERY_BACKEND}
+      MONGO_DSN: ${MONGO_DSN}
+    depends_on: 
+      - mongo
+    networks:
+      dev_network:
+        aliases:
+          - flask
+    volumes:
+      - .:/app
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    environment:
+      CELERY_BROKER: ${CELERY_BROKER}
+      CELERY_BACKEND: ${CELERY_BACKEND}
+      MONGO_DSN: ${MONGO_DSN}
+    depends_on: 
+      - mongo
+    networks:
+      dev_network:
+    volumes:
+      - .:/app

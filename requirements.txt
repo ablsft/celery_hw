@@ -1,0 +1,11 @@
+opencv-contrib-python==4.6.0.66
+opencv-python==4.6.0.66
+celery==5.3
+flask==3.0.2
+redis==5.0.1
+requests==2.31.0
+numpy==1.26.0
+pymongo[srv]==4.6.1
+Flask-PyMongo==2.3.0
+cachetools==5.3.2
+gunicorn==21.0.1
